@@ -1,6 +1,6 @@
-import checkSyntax from "../../Analyzer/SyntaxChecker.js"
-import { actuator, createChunk } from "../Main.js"
-import getNewLayerID from "../GetNewLayerID.js"
+import checkSyntax from '../../Analyzer/SyntaxChecker.js'
+import { createChunk } from '../Main.js'
+import getNewLayerID from '../GetNewLayerID.js'
 import typeToNumber from '../TypeToNumber.js'
 
 //執行運算符

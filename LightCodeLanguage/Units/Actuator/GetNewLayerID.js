@@ -6,5 +6,5 @@ export default (layerID) => {
   Object.keys(actuator.chunks).map((item) => allLayerID.push(item.layerID))
   let i = 0
   while (allLayerID.includes[`${layerID}.${i}`]) i++
-  return `${layerID}${i}`
+  return `${layerID}.${i}`
 }

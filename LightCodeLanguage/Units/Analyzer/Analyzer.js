@@ -11,7 +11,6 @@ const __dirname = `${dirname(fileURLToPath(import.meta.url))}.js`
 //分析
 export default (code, filePath) => {
   let simpleTypes = simpleTypesAnalyzer(code)
-  console.log(simpleTypes)
   if (!Array.isArray(simpleTypes)) {
     simpleTypes.path.push({ filePath: __dirname, function: '{分析器}' })
     return Object.assign(simpleTypes, { filePath })

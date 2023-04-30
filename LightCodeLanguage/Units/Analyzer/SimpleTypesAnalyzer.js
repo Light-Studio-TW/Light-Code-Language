@@ -54,7 +54,7 @@ export default (code) => {
       else if (operators.includes(code.substring(i, i+2))) {
         simpleTypes.push({ type: 'operator', value: code.substring(i, i+2), start: i, end: i+1, line, layer })
         i++
-      } else if (operators.includes(code[i])) simpleTypes.push({ type: 'operator', value: code[i], start: i, end: i+1, line, layer })
+      } else if (operators.includes(code[i])) simpleTypes.push({ type: 'operator', value: code[i], start: i, end: i, line, layer })
       else if (keywords.includes(code.substring(i, i+4))) {
         simpleTypes.push({ type: 'keyword', value: code.substring(i, i+4), start: i, end: i+3, line, layer })
         i+=4

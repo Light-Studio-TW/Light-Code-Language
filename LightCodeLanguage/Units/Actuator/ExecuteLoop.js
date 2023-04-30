@@ -1,11 +1,16 @@
 import { createTimer } from '../../Tools/Timer.js'
 
 import executeExpression from './Execute/ExecuteExpression.js'
+import executeParameters from './Execute/ExecuteParameters.js'
 import executeOperator from './Execute/ExecuteOperator.js'
+import executeKeyword from './Execute/ExecuteKeyword.js'
 import { actuator, stopActuator } from './Main.js'
+import getContainer from './Get/GetContainer.js'
+import getObject from './Get/GetObject.js'
+import getArray from './Get/GetArray.js'
 import log from './Log.js'
 
-export { executeLoop, arrangeTasks, addTask, removeTesk }
+export { executeLoop, arrangeTasks, addTask, removeTesk, throwError }
 
 //安排任務
 function arrangeTasks () {
@@ -80,8 +85,37 @@ function executeChunk (chunk) {
     else if (complexType.type === 'boolean') chunk.returnData = { type: 'boolean', value: complexType.value }
     else if (complexType.type === 'operator') {
       if (executeOperator(chunk, complexType)) return
-    } else if (complexType.type === 'expression') if (executeExpression(chunk, complexType)) return
+    } else if (complexType.type === 'expression') {
+      if (executeExpression(chunk, complexType)) return
+    } else if (complexType.type === 'keyword') {
+      if (executeKeyword(chunk, complexType)) return
+    } else if (complexType.type === 'container') {
+      let container = getContainer(complexType.value, chunk.layer)
+      if (container === undefined) {
+        throwError(chunk, { error: true, type: 'running', content: `找不到名為 ${complexType.value} 的 <容器>`, start: complexType.start, end: complexType.end, path: [{ filePath: chunk.path, function: chunk.name, line: complexType.line }] })
+        return
+      }
+      chunk.returnData = Object.assign(container.value, { container: { address: container.address, mode: container.mode }})
+    } else if (complexType.type === 'array') {
+      if (getArray(chunk, complexType)) return
+    } else if (complexType.type === 'parameters') {
+      if (executeParameters(chunk, complexType)) return
+    } else if (complexType.type === 'object') {
+      if (getObject(chunk, complexType)) return
+    }
   
     chunk.executiveData.row++
   }
+}
+
+//拋出錯誤
+function throwError (chunk, errorData) {
+  for (let i = chunk.callPath.length-1; i >= 0; i--) {
+    if (actuator.chunks[chunk.callPath[i].id] !== undefined && actuator.chunks[chunk.callPath[i].id].catchError !== undefined) {
+      //Catch功能
+      return
+    }
+    errorData.path.push({ filePath: chunk.callPath[i].path, function: chunk.callPath[i].name, line: chunk.callPath[i].line })
+  }
+  stopActuator(errorData)
 }

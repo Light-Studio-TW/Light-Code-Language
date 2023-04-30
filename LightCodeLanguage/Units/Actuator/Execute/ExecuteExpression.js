@@ -15,8 +15,9 @@ export default (chunk, complexType) => {
       else createChunk(chunk, chunk.name, 'childChunk', getNewLayerID(chunk.layer), chunk.path, complexType.value[chunk.executiveData.data.count], complexType.line, true)
       return true
     } else {
-      
+      //還沒做完
       chunk.returnedData = undefined
+      chunk.executiveData.data = {}
     }
   }
 }

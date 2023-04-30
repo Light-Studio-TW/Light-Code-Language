@@ -52,6 +52,7 @@ async function boot () {
     name: '全局',
     state: 'running', //wait
     type: 'chunk', //chunk, childChunk
+    catchError: undefined,
     layer: '0', //層, 編號
     path: actuator.mainFilePath,
 
@@ -63,7 +64,7 @@ async function boot () {
       data: {}
     },
     containers: {
-      輸出: { name: '輸出', type: 'externalFunction', value: '[外部函數: 輸出]', async: false }
+      輸出: { name: '輸出', mode: 'readOnly', value: { type: 'externalFunction', value: '[外部函數: 輸出]', async: false }}
     },
     callPath: [],
     returnedData: undefined,
@@ -84,7 +85,7 @@ async function boot () {
 boot()
 
 //創建區塊
-function createChunk (upperChunk, name, type, layerID, path, codeSegment, line, wait) {
+function createChunk (upperChunk, name, type, layer, path, codeSegment, line, wait) {
   let id = generateID(5, Object.keys(actuator.chunks))
   if (wait) upperChunk.state = `wait.${id}`
   actuator.chunks[id] = {
@@ -92,7 +93,8 @@ function createChunk (upperChunk, name, type, layerID, path, codeSegment, line, 
     name,
     state: 'running',
     type,
-    layerID,
+    catchError: undefined,
+    layer,
     path,
 
     codeSegment,
@@ -103,12 +105,13 @@ function createChunk (upperChunk, name, type, layerID, path, codeSegment, line, 
       data: {}
     },
     containers: {},
-    callPath: upperChunk.callPath.concat([{ id: upperChunk.id, name: upperChunk.name, line }]),
+    callPath: upperChunk.callPath.concat([{ id: upperChunk.id, path: upperChunk.path, name: upperChunk.name, line }]),
     returnedData: undefined,
     returnData: { type: 'none', value: '無' },
   }
   if (actuator.chunks[id].callPath.length > actuator.settings.maxCallLength) stopActuator({ error: true, content: 'callLengthOverLimit', detail: getCallPathOverLimitContent(actuator.chunks[id]) })
   addTask(id)
+  return id
 }
 
 //停止執行器
