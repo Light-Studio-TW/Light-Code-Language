@@ -1,3 +1,4 @@
+import { getLogContent } from './ExternalFunctions/Log.js'
 import checkSyntax from '../../Analyzer/SyntaxChecker.js'
 import { actuator, createChunk } from '../Main.js'
 import getNewLayerID from '../GetNewLayerID.js'
@@ -5,6 +6,20 @@ import { throwError } from '../ExecuteLoop.js'
 import typeToNumber from '../TypeToNumber.js'
 
 import typesName from '../../TypesName.json' assert { type: 'json' }
+
+//設定容器
+function setContainer (container, value) {
+  let chunk2 = actuator.chunks[container.container.address.split('.')[0]]
+  if (container.container.path.length > 0) {
+    let value2 = chunk2.containers[container.container.address.split('.')[1]].value
+    container.container.path.map((item, row) => {
+      if (row < container.container.path.length-1) value2 = value.value[item]
+    })
+    if (value2.value[container.container.path[container.container.path.length-1]].type === 'object') value2.value[container.container.path[container.container.path.length-1]].value = value
+    else value2.value[container.container.path[container.container.path.length-1]] = value
+  } else chunk2.containers[container.container.address.split('.')[1]].value = value
+  return value
+}
 
 //執行運算符
 export default (chunk, complexType) => {
@@ -29,7 +44,10 @@ export default (chunk, complexType) => {
       chunk.skip = 0
       chunk.returnedData = undefined
     }
-  } else if (complexType.value === '=') {
+  } else if (complexType.value === '++' || complexType.value === '--') {
+    if (chunk.returnData.type === 'number') chunk.returnData = setContainer(chunk.returnData, { type: 'number', value: `${(+chunk.returnData.value)+((complexType.value === '++') ? 1 : -1)}` })
+    else chunk.returnData = setContainer(chunk.returnData, { type: 'nan', value: '非數' })
+  } else if (complexType.type === '+=' || complexType.type === '-=' || complexType.type === '*=' || complexType.type === '/=' || complexType.value === '=') {
     if (chunk.returnedData === undefined) {
       if (chunk.returnData.container === undefined) {
         throwError(chunk, { error: true, type: 'running', content: `無法設定 <${typesName[chunk.returnData.type]}>，因為他沒有被儲存在任何 <容器> 裡`, start: complexType.start, end: complexType.end, path: [{ filePath: chunk.path, function: chunk.name, line: complexType.line }] })
@@ -44,17 +62,10 @@ export default (chunk, complexType) => {
       createChunk(chunk, chunk.name, 'childChunk', getNewLayerID(chunk.layer), chunk.path, chunk2, complexType.line, true)
       return true
     } else {
-      let chunk2 = actuator.chunks[chunk.returnData.container.address.split('.')[0]]
-      if (chunk.returnData.container.path.length > 0) {
-        let value = chunk2.containers[chunk.returnData.container.address.split('.')[1]].value
-        chunk.returnData.container.path.map((item, row) => {
-          if (row < chunk.returnData.container.path.length-1) value = value.value[item]
-        })
-        if (value.value[chunk.returnData.container.path[chunk.returnData.container.path.length-1]].type === 'object') value.value[chunk.returnData.container.path[chunk.returnData.container.path.length-1]].value = chunk.returnedData
-        else value.value[chunk.returnData.container.path[chunk.returnData.container.path.length-1]] = chunk.returnedData
-      } else chunk2.containers[chunk.returnData.container.address.split('.')[1]].value = chunk.returnedData
+      if (complexType.value === '=') {
+        chunk.returnData = setContainer(chunk.returnData, chunk.returnedData)
+      }
       chunk.executiveData.row+=chunk.executiveData.skip
-      chunk.returnData = chunk.returnedData
       chunk.returnedData = undefined
     }
   }

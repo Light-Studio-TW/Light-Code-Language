@@ -10,17 +10,17 @@ const __dirname = `${dirname(fileURLToPath(import.meta.url))}.js`
 
 //分析
 export default (code, filePath) => {
-  let simpleTypes = simpleTypesAnalyzer(code)
+  let simpleTypes = simpleTypesAnalyzer(code, filePath)
   if (!Array.isArray(simpleTypes)) {
     simpleTypes.path.push({ filePath: __dirname, function: '{分析器}' })
     return Object.assign(simpleTypes, { filePath })
   }
-  let complexTypes = complexTypesAnalyzer(simpleTypes)
+  let complexTypes = complexTypesAnalyzer(simpleTypes, filePath)
   if (!Array.isArray(complexTypes)) {
     complexTypes.path.push({ filePath: __dirname, function: '{分析器}' })
     return Object.assign(complexTypes, { filePath })
   }
-  let complexType2 = expressionAnalyzer(complexTypes)
+  let complexType2 = expressionAnalyzer(complexTypes, filePath)
   if (!Array.isArray(complexTypes)) {
     complexType2.path.push({ filePath: __dirname, function: '{分析器}' })
     return Object.assign(complexType2, { filePath })
@@ -31,7 +31,7 @@ export default (code, filePath) => {
       complexType2.map((item) => {
         if (item.line === i) chunk.push(item)
       })
-      let data = checkSyntax(chunk)
+      let data = checkSyntax(chunk, filePath)
       if (data !== undefined) return data
     } 
   }

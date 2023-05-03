@@ -12,5 +12,5 @@ export default (complexType) => {
   else if (complexType.type === 'array') return { type: 'number', value: `${complexType.value.length}` }
   else if (complexType.type === 'object') return { type: 'number', value: `${Object.keys(complexType.value)}` }
   else if (complexType.type === 'function') return { type: 'nan', value: '非數' }
-  else if (complexType.type === 'promise') return { type: 'number', value: `${Object.keys(complexType.value)}` }
+  else if (complexType.type === 'promise') return { type: 'nan', value: '非數' }
 }

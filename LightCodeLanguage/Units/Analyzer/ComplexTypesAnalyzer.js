@@ -1,13 +1,8 @@
-import { fileURLToPath } from 'url'
-import { dirname } from 'path'
-
 import typesName from '../TypesName.json' assert { type: 'json' }
 import checkSyntax from './SyntaxChecker.js'
 
-const __dirname = `${dirname(fileURLToPath(import.meta.url))}.js`
-
 //複雜類型分析器
-export default function complexTypesAnalyzer (simpleTypes) {
+export default function complexTypesAnalyzer (simpleTypes, filePath) {
   let complexTypes = []
   let state = {}
   for (let i = 0; i < simpleTypes.length; i++) {
@@ -25,11 +20,11 @@ export default function complexTypesAnalyzer (simpleTypes) {
         if (simpleTypes[i].type === 'symbol' && simpleTypes[i].value === ']' && state.layer === simpleTypes[i].layer) {
           let items = []
           for (let i2 = 0; i2 < state.value.length; i2++) {
-            let data = complexTypesAnalyzer(state.value[i2])
+            let data = complexTypesAnalyzer(state.value[i2], filePath)
             if (!Array.isArray(data)) return data
-            let data2 = checkSyntax(data, ` (<陣列> 的第 ${i2} 項)`)
+            let data2 = checkSyntax(data, filePath, ` (<陣列> 的第 ${i2} 項)`)
             if (data2 !== undefined) {
-              data2.path.push({ filePath: __dirname, function: '{複雜類型分析器}' })
+              data2.path.push({ filePath, function: '{複雜類型分析器}' })
               return data2
             }
             items.push(data)
@@ -44,11 +39,11 @@ export default function complexTypesAnalyzer (simpleTypes) {
         if (simpleTypes[i].type === 'symbol' && simpleTypes[i].value === ')' && state.layer === simpleTypes[i].layer) {
           let items = []
           for (let i2 = 0; i2 < state.value.length; i2++) {
-            let data = complexTypesAnalyzer(state.value[i2])
+            let data = complexTypesAnalyzer(state.value[i2], filePath)
             if (!Array.isArray(data)) return data
-            let data2 = checkSyntax(data, ` (<參數列> 的第 ${i2} 項)`)
+            let data2 = checkSyntax(data, filePath, ` (<參數列> 的第 ${i2} 項)`)
             if (data2 !== undefined) {
-              data2.path.push({ filePath: __dirname, function: '{複雜類型分析器}' })
+              data2.path.push({ filePath, function: '{複雜類型分析器}' })
               return data2
             }
             items.push(data)
@@ -75,20 +70,20 @@ export default function complexTypesAnalyzer (simpleTypes) {
                 if (item[skip+1] !== undefined && item[skip+1].type === 'symbol' && item[skip+1].value === ':') {
                   let value = []
                   for (let i = skip+2; i < item.length; i++) value.push(item[i])
-                  value = complexTypesAnalyzer(value)
+                  value = complexTypesAnalyzer(value, filePath)
                   if (!Array.isArray(value)) return value
-                  let data = checkSyntax(value, ` (<物件> 的 ${item[skip].value})`)
+                  let data = checkSyntax(value, filePath, ` (<物件> 的 ${item[skip].value})`)
                   if (data !== undefined) {
-                    data.path.push({ filePath: __dirname, function: '{複雜類型分析器}' })
+                    data.path.push({ filePath, function: '{複雜類型分析器}' })
                     return data
                   }
                   object[item[skip].value] = { value, mode }
                 } else {
-                  if (item.length-skip > 1) return { error: true, type: 'analysis', content: `多出了一個 <${typesName[item[skip+1].type]}>`, start: item[skip+1].start, end: item[skip+1].end, path: [{ filePath: __dirname, function: '{複雜類型分析器}', line: item[skip+1].line }] }
+                  if (item.length-skip > 1) return { error: true, type: 'analysis', content: `多出了一個 <${typesName[item[skip+1].type]}>`, start: item[skip+1].start, end: item[skip+1].end, path: [{ filePath, function: '{複雜類型分析器}', line: item[skip+1].line }] }
                   object[item[skip].value] = { value: [{ type: 'none', value: '無', mode }], mode }
                 }
               } else {
-                return { error: true, type: 'analysis', content: '<物件> 的 <鑰> 必須為一個 <容器>', start: item[skip].start, end: item[skip].end, path: [{ filePath: __dirname, function: '{複雜類型分析器}', line: item[skip].line }] }
+                return { error: true, type: 'analysis', content: '<物件> 的 <鑰> 必須為一個 <容器>', start: item[skip].start, end: item[skip].end, path: [{ filePath, function: '{複雜類型分析器}', line: item[skip].line }] }
               }
             }
           }
@@ -102,14 +97,14 @@ export default function complexTypesAnalyzer (simpleTypes) {
         if (simpleTypes[i].type === 'symbol' && simpleTypes[i].value === ']' && state.layer === simpleTypes[i].layer) {
           let items = []
           if (state.value[0].length < 1) {
-            return { error: true, type: 'analysis', content: '<索引列> 中最少要有一個項目', start: state.start, end: simpleTypes[i].end, path: [{ filePath: __dirname, function: '{複雜類型分析器}', line: simpleTypes[i].line }] }
+            return { error: true, type: 'analysis', content: '<索引列> 中最少要有一個項目', start: state.start, end: simpleTypes[i].end, path: [{ filePath, function: '{複雜類型分析器}', line: simpleTypes[i].line }] }
           }
           for (let i2 = 0; i2 < state.value.length; i2++) {
             let data = complexTypesAnalyzer(state.value[i2])
             if (!Array.isArray(data)) return data
-            let data2 = checkSyntax(data, ` (<索引列> 的第 ${i2} 項)`)
+            let data2 = checkSyntax(data, filePath, ` (<索引列> 的第 ${i2} 項)`)
             if (data2 !== undefined) {
-              data2.path.push({ filePath: __dirname, function: '{複雜類型分析器}' })
+              data2.path.push({ filePath, function: '{複雜類型分析器}' })
               return data2
             }
             items.push(data)
@@ -122,7 +117,7 @@ export default function complexTypesAnalyzer (simpleTypes) {
         }
       } else if (state.nowType === 'chunk') {
         if (simpleTypes[i].type === 'symbol' && simpleTypes[i].value === '}' && state.layer === simpleTypes[i].layer) {
-          let data = complexTypesAnalyzer(state.value)
+          let data = complexTypesAnalyzer(state.value, filePath)
           if (!Array.isArray(data)) return data
           complexTypes.push({ type: 'chunk', value: state.value, start: state.start, end: simpleTypes[i].end, line: state.startLine, layer: state.layer })
           state = {}
@@ -130,9 +125,9 @@ export default function complexTypesAnalyzer (simpleTypes) {
       }
     }
   }
-  if (state.nowType === 'array') return { error: true, type: 'analysis', content: '<陣列> 的尾端缺少 "]"', start: state.start, end: simpleTypes[simpleTypes.length-1].end, path: [{ filePath: __dirname, function: '{複雜類型分析器}', line: state.startLine }] }
-  else if (state.nowType === 'parameters') return { error: true, type: 'analysis', content: '<參數列> 的尾端缺少 ")"', start: state.start, end: simpleTypes[simpleTypes.length-1].end, path: [{ filePath: __dirname, function: '{複雜類型分析器}', line: state.startLine }] }
-  else if (state.nowType === 'object') return { error: true, type: 'analysis', content: '<物件> 的尾端缺少 "}"', start: state.start, end: simpleTypes[simpleTypes.length-1].end, path: [{ filePath: __dirname, function: '{複雜類型分析器}', line: state.startLine }] }
-  else if (state.nowType === 'chunk') return { error: true, type: 'analysis', content: '<區塊> 的尾端缺少 "}"', start: state.start, end: simpleTypes[simpleTypes.length-1].end, path: [{ filePath: __dirname, function: '{複雜類型分析器}', line: state.startLine }] }
+  if (state.nowType === 'array') return { error: true, type: 'analysis', content: '<陣列> 的尾端缺少 "]"', start: state.start, end: simpleTypes[simpleTypes.length-1].end, path: [{ filePath, function: '{複雜類型分析器}', line: state.startLine }] }
+  else if (state.nowType === 'parameters') return { error: true, type: 'analysis', content: '<參數列> 的尾端缺少 ")"', start: state.start, end: simpleTypes[simpleTypes.length-1].end, path: [{ filePath, function: '{複雜類型分析器}', line: state.startLine }] }
+  else if (state.nowType === 'object') return { error: true, type: 'analysis', content: '<物件> 的尾端缺少 "}"', start: state.start, end: simpleTypes[simpleTypes.length-1].end, path: [{ filePath, function: '{複雜類型分析器}', line: state.startLine }] }
+  else if (state.nowType === 'chunk') return { error: true, type: 'analysis', content: '<區塊> 的尾端缺少 "}"', start: state.start, end: simpleTypes[simpleTypes.length-1].end, path: [{ filePath, function: '{複雜類型分析器}', line: state.startLine }] }
   return complexTypes
 }

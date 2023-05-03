@@ -1,9 +1,9 @@
 import keywords from '../Keywords.json' assert { type: 'json' }
 
-const operators = ['+', '+=', '-', '-=', '*', '*=', '/', '/=', '>', '>=', '<', '<=', '=', '==', '或', '且']
+const operators = ['+', '++', '+=', '-', '--', '-=', '*', '*=', '/', '/=', '>', '>=', '<', '<=', '=', '==',  '!', '或', '且']
 
 //簡易類型分析器
-export default (code) => {
+export default (code, filePath) => {
   let simpleTypes = []
   let state = {}
   let layer = 0
@@ -97,7 +97,7 @@ export default (code) => {
       }
     }
   }
-  if (state.nowType === 'string') return { error: true, type: 'analysis', content: `<字串> 的尾端缺少 ${state.symbol}`, start: state.start, end: code.length-1, path: [{ function: '{簡易類型分析器}', line: state.startLine }] }
+  if (state.nowType === 'string') return { error: true, type: 'analysis', content: `<字串> 的尾端缺少 ${state.symbol}`, start: state.start, end: code.length-1, path: [{ filePath, function: '{簡易類型分析器}', line: state.startLine }] }
   else if (state.nowType !== undefined) simpleTypes.push({ type: state.nowType, value: state.value, start: state.start, end: code.length-1, line, layer })
   return simpleTypes
 }
