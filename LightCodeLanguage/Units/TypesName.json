@@ -13,8 +13,9 @@
   "parameters":"參數列",
   "object":"物件",
   "key":"鑰",
-  "index":"索引",
+  "index":"索引列",
   "chunk":"區塊",
   "function":"函數",
-  "promise":"承諾"
+  "promise":"承諾",
+  "link":"連結"
 }

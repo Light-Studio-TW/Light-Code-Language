@@ -3,8 +3,8 @@ import { parentPort, workerData } from 'node:worker_threads'
 import getVariableSize from '../../Tools/GetVariableSize.js'
 import generateID from '../../Tools/GenerateID.js'
 
-import getCallPathOverLimitContent from './GetCallPathOverLimitContent.js'
-import getVMemoryOverLimitContent from './GetVMemoryOverLimitContent.js'
+import getCallPathOverLimitContent from './ErrorContent/GetCallPathOverLimitContent.js'
+import getVMemoryOverLimitContent from './ErrorContent/GetVMemoryOverLimitContent.js'
 import analysis from '../Analyzer/Analyzer.js'
 import { executeLoop, addTask } from './ExecuteLoop.js'
 import log from './Log.js'
@@ -34,17 +34,17 @@ export { actuator, createChunk, stopActuator }
 
 //啟動執行器
 async function boot () {
-  log('actuatorLog', '正在啟動執行器')
+  await log('actuatorLog', '正在啟動執行器')
 
   //分析程式碼
-  log('actuatorLog', `開始分析 (長度: ${actuator.code.length})`)
+  await log('actuatorLog', `開始分析 (長度: ${actuator.code.length})`)
   const time = performance.now()
   let codeSegment = analysis(actuator.code, actuator.mainFilePath)
   if (!Array.isArray(codeSegment)) {
-    log('actuatorLog', `分析時發生錯誤`)
+    await log('actuatorLog', `分析時發生錯誤`)
     stopActuator(codeSegment)
   }
-  log('actuatorLog', `分析完成 (花費 ${Math.round((performance.now()-time)*1000)/1000} ms)`)
+  await log('actuatorLog', `分析完成 (花費 ${Math.round((performance.now()-time)*1000)/1000} ms)`)
 
   //添加主Chunk
   actuator.chunks.main = {
@@ -75,7 +75,7 @@ async function boot () {
   actuator.state.vMem = getVariableSize(actuator)
   if (actuator.state.vMem > actuator.settings.vMemCanUse) stopActuator({ error: true, content: 'vMemOverLimit', detail: getVMemoryOverLimitContent() })
 
-  log('actuatorLog', '啟動完成')
+  await log('actuatorLog', '啟動完成')
 
   //開始執行
   console.log(codeSegment)

@@ -83,7 +83,7 @@ export default (code) => {
           i--
         } else state.value+=code[i]
       } else if (state.nowType === 'key') {
-        if (code[i] === "'" || code[i] === '"' || operators.includes(code[i])) {
+        if (code[i] === "'" || code[i] === '"' || operators.includes(code[i]) || code[i] === '.') {
           if (state.value.length > 0) simpleTypes.push({ type: 'key', value: state.value, start: state.start, end: i-1, line, layer })
           state = {}
           i--

@@ -1,14 +1,17 @@
 import { createTimer } from '../../Tools/Timer.js'
 
-import executeExpression from './Execute/ExecuteExpression.js'
-import executeParameters from './Execute/ExecuteParameters.js'
-import executeOperator from './Execute/ExecuteOperator.js'
-import executeKeyword from './Execute/ExecuteKeyword.js'
 import { actuator, stopActuator } from './Main.js'
-import getContainer from './Get/GetContainer.js'
-import getObject from './Get/GetObject.js'
-import getArray from './Get/GetArray.js'
 import log from './Log.js'
+
+import getContainer from './Functions/Container.js'
+import expression from './Functions/Expression.js'
+import parameters from './Functions/Parameters.js'
+import operator from './Functions/Operator.js'
+import object from './Functions/Object.js'
+import keyword from './Functions/Keyword.js'
+import array from './Functions/Array.js'
+import index from './Functions/Index.js'
+import key from './Functions/Key.js'
 
 export { executeLoop, arrangeTasks, addTask, removeTesk, throwError }
 
@@ -47,14 +50,14 @@ function removeTesk (chunkId) {
 }
 
 //執行循環
-function executeLoop () {
-  log('actuatorLog', '開始執行')
+async function executeLoop () {
+  await log('actuatorLog', '開始執行')
   arrangeTasks()
 
-  createTimer(Infinity, actuator.settings.interval, () => {
+  createTimer(Infinity, actuator.settings.interval, async () => {
     //檢查是否還有任務要執行，如果沒有了，就停止執行器
     if (actuator.executiveData.tasks.length <= 1 && actuator.executiveData.tasks[0].length < 1) {
-      log('actuatorLog', '執行完成')
+      await log('actuatorLog', '執行完成')
       stopActuator(actuator.returnData)
     }
 
@@ -84,26 +87,28 @@ function executeChunk (chunk) {
     else if (complexType.type === 'none') chunk.returnData = { type: 'none', value: complexType.value }
     else if (complexType.type === 'boolean') chunk.returnData = { type: 'boolean', value: complexType.value }
     else if (complexType.type === 'operator') {
-      if (executeOperator(chunk, complexType)) return
+      if (operator(chunk, complexType)) return
     } else if (complexType.type === 'expression') {
-      if (executeExpression(chunk, complexType)) return
+      if (expression(chunk, complexType)) return
     } else if (complexType.type === 'keyword') {
-      if (executeKeyword(chunk, complexType)) return
+      if (keyword(chunk, complexType)) return
     } else if (complexType.type === 'container') {
       let container = getContainer(complexType.value, chunk.layer)
       if (container === undefined) {
         throwError(chunk, { error: true, type: 'running', content: `找不到名為 ${complexType.value} 的 <容器>`, start: complexType.start, end: complexType.end, path: [{ filePath: chunk.path, function: chunk.name, line: complexType.line }] })
         return
       }
-      chunk.returnData = Object.assign(container.value, { container: { address: container.address, mode: container.mode }})
+      chunk.returnData = Object.assign(container.value, { container: { address: container.address, path: [], mode: container.mode }})
     } else if (complexType.type === 'array') {
-      if (getArray(chunk, complexType)) return
+      if (array(chunk, complexType)) return
     } else if (complexType.type === 'parameters') {
-      if (executeParameters(chunk, complexType)) return
+      if (parameters(chunk, complexType)) return
     } else if (complexType.type === 'object') {
-      if (getObject(chunk, complexType)) return
+      if (object(chunk, complexType)) return
+    } else if (complexType.type === 'key') key(chunk, complexType)
+    else if (complexType.type === 'index') {
+      if (index(chunk, complexType)) return
     }
-  
     chunk.executiveData.row++
   }
 }

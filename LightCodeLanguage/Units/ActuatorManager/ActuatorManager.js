@@ -62,6 +62,7 @@ function runActuator (id) {
       }
     } else if (msg.type === 'log') {
       log(id, msg.data)
+      actuators[id].worker.postMessage({ id: msg.id, type: 'return' })
     }
   }
 }
