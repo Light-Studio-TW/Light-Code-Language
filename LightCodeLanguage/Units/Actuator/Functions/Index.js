@@ -22,12 +22,15 @@ export default (chunk, complexType) => {
       return true
     } else {
       if (chunk.returnData.type === 'string' || chunk.returnData.type === 'number') {
+        //讀取字串和數字
         if (chunk.executiveData.data.index[0].type !== 'number') {
           throwError(chunk, { error: true, type: 'running', content: `<索引> 的第 0 項必須為一個 <數字>，因為你正在讀取一個 <${typesName[chunk.returnData.type]}>`, start: complexType.start, end: complexType.end, path: [{ filePath: chunk.path, function: chunk.name, line: complexType.line }] })
           return
         }
-        if (chunk.executiveData.data.index.length === 1) chunk.returnData = { type: chunk.returnData.type, value: chunk.returnData.value[chunk.executiveData.data.index[0].value] }
-        else {
+        if (chunk.executiveData.data.index.length === 1) {
+          let value = chunk.returnData.value[chunk.executiveData.data.index[0].value]
+          chunk.returnData = { type: chunk.returnData.type, value: (value === undefined) ? '' : value  }
+        } else {
           if (chunk.executiveData.data.index[1].type !== 'number') {
             throwError(chunk, { error: true, type: 'running', content: `<索引> 的第 1 項必須為一個 <數字>，因為你正在讀取一個 <${typesName[chunk.returnData.type]}>`, start: complexType.start, end: complexType.end, path: [{ filePath: chunk.path, function: chunk.name, line: complexType.line }] })
             return
@@ -35,10 +38,27 @@ export default (chunk, complexType) => {
           chunk.returnData = { type: chunk.returnData.type, value: chunk.returnData.value.substring(chunk.executiveData.data.index[0].value, (+chunk.executiveData.data.index[1].value)+1) }
         }
       } else if (chunk.returnData.type === 'array') {
+        //讀取陣列
         if (chunk.executiveData.data.index[0].type !== 'number') {
-          throwError(chunk, { error: true, type: 'running', content: `<索引> 的第 0 項必須為一個 <數字>，因為你正在讀取一個 <${typesName[chunk.returnData.type]}>`, start: complexType.start, end: complexType.end, path: [{ filePath: chunk.path, function: chunk.name, line: complexType.line }] })
+          throwError(chunk, { error: true, type: 'running', content: `<索引> 的第 0 項必須為一個 <數字>，因為你正在讀取一個 <陣列>`, start: complexType.start, end: complexType.end, path: [{ filePath: chunk.path, function: chunk.name, line: complexType.line }] })
           return
         }
+        let value = chunk.returnData.value[chunk.executiveData.data.index[0].value]
+        if (value === undefined) chunk.returnData = { type: 'none', value: '無' }
+        else {
+          if (chunk.returnData.container === undefined) chunk.returnData = value
+          else chunk.returnData = Object.assign(value, { container: { address: chunk.returnData.container.address, path: chunk.returnData.container.path.concat([chunk.executiveData.data.index[0].value]), mode: chunk.returnData.container.mode }})
+        }
+      } else if (chunk.returnData.type === 'object') {
+        //讀取陣列
+        if (chunk.executiveData.data.index[0].type !== 'string') {
+          throwError(chunk, { error: true, type: 'running', content: `<索引> 的第 0 項必須為一個 <字串>，因為你正在讀取一個 <物件>`, start: complexType.start, end: complexType.end, path: [{ filePath: chunk.path, function: chunk.name, line: complexType.line }] })
+          return
+        }
+        let value = chunk.returnData.value[chunk.executiveData.data.index[0].value]
+        if (value === undefined) value = { type: 'none', value: '無' }
+        if (chunk.returnData.container === undefined) chunk.returnData = value
+        else chunk.returnData = Object.assign(value, { container: { address: chunk.returnData.container.address, path: chunk.returnData.container.path.concat([chunk.executiveData.data.index[0].value]), mode: chunk.returnData.container.mode }})
       }
       chunk.returnedData = undefined
       chunk.executiveData.data = {}

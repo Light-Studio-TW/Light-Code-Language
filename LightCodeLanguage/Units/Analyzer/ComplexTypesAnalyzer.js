@@ -64,6 +64,7 @@ export default function complexTypesAnalyzer (simpleTypes) {
           let object = {}
           if (state.value[0].length > 0) {
             for (let item of state.value) {
+              if (item.length < 1) break
               let mode = 'normal'
               let skip = 0
               if (item[0].type === 'keyword' && item[0].value === '唯讀') {

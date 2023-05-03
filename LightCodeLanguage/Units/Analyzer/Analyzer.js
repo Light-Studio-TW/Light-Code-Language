@@ -25,13 +25,15 @@ export default (code, filePath) => {
     complexType2.path.push({ filePath: __dirname, function: '{分析器}' })
     return Object.assign(complexType2, { filePath })
   }
-  for (let i = 1; i <= complexType2[complexType2.length-1].line; i++) {
-    let chunk = []
-    complexType2.map((item) => {
-      if (item.line === i) chunk.push(item)
-    })
-    let data = checkSyntax(chunk)
-    if (data !== undefined) return data
-  } 
+  if (complexType2.length > 0) {
+    for (let i = 1; i <= complexType2[complexType2.length-1].line; i++) {
+      let chunk = []
+      complexType2.map((item) => {
+        if (item.line === i) chunk.push(item)
+      })
+      let data = checkSyntax(chunk)
+      if (data !== undefined) return data
+    } 
+  }
   return complexType2
 }

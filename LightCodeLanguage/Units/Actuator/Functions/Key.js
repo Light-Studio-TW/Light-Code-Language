@@ -1,6 +1,7 @@
 import { throwError } from '../ExecuteLoop.js'
 
 import typesName from '../../TypesName.json' assert { type: 'json' }
+import { actuator } from '../Main.js'
 
 //鑰
 export default (chunk, complexType) => {
@@ -12,7 +13,8 @@ export default (chunk, complexType) => {
     chunk.returnData.value = chunk.returnData.value[complexType.value]
   } else {
     chunk.returnData.container.mode = chunk.returnData.value[complexType.value].mode
-    chunk.returnData.value = chunk.returnData.value[complexType.value].value.value
+    chunk.returnData.value = chunk.returnData.value[complexType.value].value
     chunk.returnData.container.path.push(complexType.value)
+    //console.log(actuator.chunks[chunk.returnData.container.address.split('.')[0]].containers[chunk.returnData.container.address.split('.')[1]])
   }
 }

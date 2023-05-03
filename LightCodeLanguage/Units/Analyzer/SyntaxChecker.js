@@ -18,7 +18,7 @@ const relevance = {
   container: ['operator', 'keyword', 'parameters', 'key', 'index'],
   array: ['operator', 'keyword', 'parameters', 'index'],
   parameters: ['operator'],
-  object: ['operator', 'keyword'],
+  object: ['operator', 'keyword', 'key'],
   key: ['operator', 'keyword', 'parameters', 'key', 'index'],
   index: ['operator', 'keyword', 'parameters', 'key', 'index'],
   chunk: []

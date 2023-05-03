@@ -18,7 +18,7 @@ export default (chunk, complexType) => {
         if (checkSyntax(chunk2.concat([chunk.codeSegment[i]])) === undefined) chunk2.push(chunk.codeSegment[i])
         else break
       }
-      chunk.executiveData.skip = 1+chunk2.length
+      chunk.executiveData.skip = 2+chunk2.length
       createChunk(chunk, chunk.name, 'childChunk', getNewLayerID(chunk.layer), chunk.path, chunk2, complexType.line, true)
       return true
     } else {

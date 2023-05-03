@@ -1,8 +1,8 @@
 import checkSyntax from '../../Analyzer/SyntaxChecker.js'
+import { actuator, createChunk } from '../Main.js'
 import getNewLayerID from '../GetNewLayerID.js'
 import { throwError } from '../ExecuteLoop.js'
 import typeToNumber from '../TypeToNumber.js'
-import { createChunk } from '../Main.js'
 
 import typesName from '../../TypesName.json' assert { type: 'json' }
 
@@ -44,7 +44,18 @@ export default (chunk, complexType) => {
       createChunk(chunk, chunk.name, 'childChunk', getNewLayerID(chunk.layer), chunk.path, chunk2, complexType.line, true)
       return true
     } else {
-      
+      let chunk2 = actuator.chunks[chunk.returnData.container.address.split('.')[0]]
+      if (chunk.returnData.container.path.length > 0) {
+        let value = chunk2.containers[chunk.returnData.container.address.split('.')[1]].value
+        chunk.returnData.container.path.map((item, row) => {
+          if (row < chunk.returnData.container.path.length-1) value = value.value[item]
+        })
+        if (value.value[chunk.returnData.container.path[chunk.returnData.container.path.length-1]].type === 'object') value.value[chunk.returnData.container.path[chunk.returnData.container.path.length-1]].value = chunk.returnedData
+        else value.value[chunk.returnData.container.path[chunk.returnData.container.path.length-1]] = chunk.returnedData
+      } else chunk2.containers[chunk.returnData.container.address.split('.')[1]].value = chunk.returnedData
+      chunk.executiveData.row+=chunk.executiveData.skip
+      chunk.returnData = chunk.returnedData
+      chunk.returnedData = undefined
     }
   }
 }
