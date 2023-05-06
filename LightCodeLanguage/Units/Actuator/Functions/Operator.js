@@ -62,7 +62,9 @@ export default (chunk, complexType) => {
       createChunk(chunk, chunk.name, 'childChunk', getNewLayerID(chunk.layer), chunk.path, chunk2, complexType.line, true)
       return true
     } else {
-      if (complexType.value === '=') {
+      if (complexType.type === '+=') {
+        
+      } else if (complexType.value === '=') {
         chunk.returnData = setContainer(chunk.returnData, chunk.returnedData)
       }
       chunk.executiveData.row+=chunk.executiveData.skip

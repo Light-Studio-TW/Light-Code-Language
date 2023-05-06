@@ -7,14 +7,16 @@ function getLogContent (complexType, layer) {
     if (layer > 0) return `[陣列: ${complexType.value.length}]`
     else {
       let items = []
-      complexType.value.map((item) => items.push(getLogContent(item, 0)))
+      complexType.value.map((item) => items.push(getLogContent(item, layer+1)))
       return `[${items.join(', ')}]`
     }
   } else if (complexType.type === 'object') {
     let keys = Object.keys(complexType.value)
     let items = []
-    keys.map((item) => items.push(getLogContent(complexType.value[item], 0)))
+    keys.map((item) => items.push(getLogContent(complexType.value[item], layer+1)))
     return `{${items.join(', ')}}`
+  } else {
+    return complexType.value
   }
 }
 
