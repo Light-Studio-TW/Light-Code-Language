@@ -3,6 +3,9 @@ import getNewLayerID from '../GetNewLayerID.js'
 import typeToNumber from '../TypeToNumber.js'
 import { createChunk } from '../Main.js'
 
+export { calculateExpression, expression }
+
+//計算運算式
 function calculateExpression (values) {
   let type = 'number'
   for (let item of values) {
@@ -37,7 +40,7 @@ function calculateExpression (values) {
 }
 
 //執行運算式
-export default (chunk, complexType) => {
+function expression (chunk, complexType) {
   if (chunk.returnedData === undefined) {
     chunk.executiveData.data = { count: 0, values: [] }
     createChunk(chunk, chunk.name, 'childChunk', getNewLayerID(chunk.layer), chunk.path, complexType.value[0], complexType.line, true)

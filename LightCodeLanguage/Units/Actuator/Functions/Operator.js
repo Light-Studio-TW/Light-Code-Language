@@ -1,4 +1,4 @@
-import { getLogContent } from './ExternalFunctions/Log.js'
+import { calculateExpression } from './Expression.js'
 import checkSyntax from '../../Analyzer/SyntaxChecker.js'
 import { actuator, createChunk } from '../Main.js'
 import getNewLayerID from '../GetNewLayerID.js'
@@ -47,7 +47,7 @@ export default (chunk, complexType) => {
   } else if (complexType.value === '++' || complexType.value === '--') {
     if (chunk.returnData.type === 'number') chunk.returnData = setContainer(chunk.returnData, { type: 'number', value: `${(+chunk.returnData.value)+((complexType.value === '++') ? 1 : -1)}` })
     else chunk.returnData = setContainer(chunk.returnData, { type: 'nan', value: '非數' })
-  } else if (complexType.type === '+=' || complexType.type === '-=' || complexType.type === '*=' || complexType.type === '/=' || complexType.value === '=') {
+  } else if (complexType.value === '+=' || complexType.value === '-=' || complexType.value === '*=' || complexType.value === '/=' || complexType.value === '=') {
     if (chunk.returnedData === undefined) {
       if (chunk.returnData.container === undefined) {
         throwError(chunk, { error: true, type: 'running', content: `無法設定 <${typesName[chunk.returnData.type]}>，因為他沒有被儲存在任何 <容器> 裡`, start: complexType.start, end: complexType.end, path: [{ filePath: chunk.path, function: chunk.name, line: complexType.line }] })
@@ -62,11 +62,11 @@ export default (chunk, complexType) => {
       createChunk(chunk, chunk.name, 'childChunk', getNewLayerID(chunk.layer), chunk.path, chunk2, complexType.line, true)
       return true
     } else {
-      if (complexType.type === '+=') {
-        
-      } else if (complexType.value === '=') {
-        chunk.returnData = setContainer(chunk.returnData, chunk.returnedData)
-      }
+      if (complexType.value === '+=') chunk.returnData = setContainer(chunk.returnData, calculateExpression([chunk.returnData, '+', chunk.returnedData]))
+      else if (complexType.value === '-=') chunk.returnData = setContainer(chunk.returnData, calculateExpression([chunk.returnData, '-', chunk.returnedData]))
+      else if (complexType.value === '*=') chunk.returnData = setContainer(chunk.returnData, calculateExpression([chunk.returnData, '*', chunk.returnedData]))
+      else if (complexType.value === '/=') chunk.returnData = setContainer(chunk.returnData, calculateExpression([chunk.returnData, '/', chunk.returnedData]))
+      else if (complexType.value === '=') chunk.returnData = setContainer(chunk.returnData, chunk.returnedData)
       chunk.executiveData.row+=chunk.executiveData.skip
       chunk.returnedData = undefined
     }

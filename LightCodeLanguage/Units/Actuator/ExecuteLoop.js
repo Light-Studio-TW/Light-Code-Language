@@ -4,7 +4,7 @@ import { actuator, stopActuator } from './Main.js'
 import log from './Log.js'
 
 import getContainer from './Functions/Container.js'
-import expression from './Functions/Expression.js'
+import { expression } from './Functions/Expression.js'
 import parameters from './Functions/Parameters.js'
 import operator from './Functions/Operator.js'
 import object from './Functions/Object.js'
@@ -115,12 +115,13 @@ function executeChunk (chunk) {
 
 //拋出錯誤
 function throwError (chunk, errorData) {
+  if (chunk.type !== 'chunk') errorData.path.splice(0, 1)
   for (let i = chunk.callPath.length-1; i >= 0; i--) {
     if (actuator.chunks[chunk.callPath[i].id] !== undefined && actuator.chunks[chunk.callPath[i].id].catchError !== undefined) {
       //Catch功能
       return
     }
-    errorData.path.push({ filePath: chunk.callPath[i].path, function: chunk.callPath[i].name, line: chunk.callPath[i].line })
+    if (chunk.callPath[i].type === 'chunk') errorData.path.push({ filePath: chunk.callPath[i].path, function: chunk.callPath[i].name, line: chunk.callPath[i].line })
   }
   stopActuator(errorData)
 }

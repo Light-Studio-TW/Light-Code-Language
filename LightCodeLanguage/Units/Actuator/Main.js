@@ -105,7 +105,7 @@ function createChunk (upperChunk, name, type, layer, path, codeSegment, line, wa
       data: {}
     },
     containers: {},
-    callPath: upperChunk.callPath.concat([{ id: upperChunk.id, path: upperChunk.path, name: upperChunk.name, line }]),
+    callPath: upperChunk.callPath.concat([{ id: upperChunk.id, type: upperChunk.type, path: upperChunk.path, name: upperChunk.name, line }]),
     returnedData: undefined,
     returnData: { type: 'none', value: '無' },
   }

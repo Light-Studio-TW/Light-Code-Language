@@ -16,7 +16,7 @@ export default (complexTypes, filePath) => {
           complexTypes2.splice(i2, 1)
           i2--
         }
-        state = { nowType: 'expression', value: [chunk, complexTypes[i].value, []] }
+        state = { nowType: 'expression', value: [chunk, complexTypes[i].value, []], startLine: complexTypes.startLine, layer: complexTypes.layer }
       } else complexTypes2.push(complexTypes[i])
     } else {
       if (state.nowType === 'expression') {
@@ -26,7 +26,7 @@ export default (complexTypes, filePath) => {
         } else {
           let data = checkSyntax(state.value[state.value.length-1].concat([complexTypes[i]]), filePath)
           if (data !== undefined) {
-            complexTypes2.push({ type: 'expression', value: state.value, start: state.value[0][0].start, end: state.value[state.value.length-1][state.value[state.value.length-1].length-1].end })
+            complexTypes2.push({ type: 'expression', value: state.value, start: state.value[0][0].start, end: state.value[state.value.length-1][state.value[state.value.length-1].length-1].end, line: state.startLine, layer: state.layer })
             state = {}
           } else {
             state.value[state.value.length-1].push(complexTypes[i])
@@ -35,6 +35,6 @@ export default (complexTypes, filePath) => {
       }
     }
   }
-  if (state.nowType !== undefined) complexTypes2.push({ type: 'expression', value: state.value, start: state.value[0][0].start, end: state.value[state.value.length-1][state.value[state.value.length-1].length-1].end })
+  if (state.nowType !== undefined) complexTypes2.push({ type: 'expression', value: state.value, start: state.value[0][0].start, end: state.value[state.value.length-1][state.value[state.value.length-1].length-1].end, line: state.startLine, layer: state.layer })
   return complexTypes2
 }
