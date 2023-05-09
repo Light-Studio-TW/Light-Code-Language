@@ -98,7 +98,7 @@ function executeChunk (chunk) {
         throwError(chunk, { error: true, type: 'running', content: `找不到名為 ${complexType.value} 的 <容器>`, start: complexType.start, end: complexType.end, path: [{ filePath: chunk.path, function: chunk.name, line: complexType.line }] })
         return
       }
-      chunk.returnData = Object.assign(JSON.parse(JSON.stringify(container.value)), { container: { address: container.address, path: [], mode: container.mode }})
+      chunk.returnData = Object.assign(JSON.parse(JSON.stringify(container.value)), { container: { address: container.address, name: complexType.value, path: [], mode: container.mode }})
     } else if (complexType.type === 'array') {
       if (array(chunk, complexType)) return
     } else if (complexType.type === 'parameters') {

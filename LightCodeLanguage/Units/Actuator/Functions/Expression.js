@@ -31,8 +31,8 @@ function calculateExpression (values) {
   }
   let result = eval?.(string)
   if (typeof result === 'string') return { type: 'string', value: result }
-  else if (typeof result === 'number') return { type: 'number', value: `${result}` }
   else if (isNaN(result)) return { type: 'nan', value: '非數' }
+  else if (typeof result === 'number') return { type: 'number', value: `${result}` }
   else if (typeof result === 'boolean') {
     if (result) return { type: 'boolean', value: '是' }
     else return { type: 'boolean', value: '否' }

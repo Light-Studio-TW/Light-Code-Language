@@ -1,5 +1,5 @@
-import { calculateExpression } from './Expression.js'
 import checkSyntax from '../../Analyzer/SyntaxChecker.js'
+import { calculateExpression } from './Expression.js'
 import { actuator, createChunk } from '../Main.js'
 import getNewLayerID from '../GetNewLayerID.js'
 import { throwError } from '../ExecuteLoop.js'
@@ -45,7 +45,15 @@ export default (chunk, complexType) => {
       chunk.returnedData = undefined
     }
   } else if (complexType.value === '++' || complexType.value === '--') {
-    if (chunk.returnData.type === 'number') chunk.returnData = setContainer(chunk.returnData, { type: 'number', value: `${(+chunk.returnData.value)+((complexType.value === '++') ? 1 : -1)}` })
+    if (chunk.returnData.container === undefined) {
+      throwError(chunk, { error: true, type: 'running', content: `無法設定 <${typesName[chunk.returnData.type]}>，因為他沒有被儲存在任何 <容器> 裡`, start: complexType.start, end: complexType.end, path: [{ filePath: chunk.path, function: chunk.name, line: complexType.line }] })
+      return
+    } else if (chunk.returnData.container.mode === 'readOnly') {
+      throwError(chunk, { error: true, type: 'running', content: `無法設定 <容器> ${chunk.returnData.container.name}，因為它為 唯讀 <容器>`, start: complexType.start, end: complexType.end, path: [{ filePath: chunk.path, function: chunk.name, line: complexType.line }] })
+      return
+    }
+    if (complexType.value === '++') chunk.returnData = setContainer(chunk.returnData, calculateExpression([chunk.returnData, '+', { type: 'number', value: '1' }]))
+    else if (complexType.value === '--') chunk.returnData = setContainer(chunk.returnData, calculateExpression([chunk.returnData, '-', { type: 'number', value: '1' }]))
     else chunk.returnData = setContainer(chunk.returnData, { type: 'nan', value: '非數' })
   } else if (complexType.value === '+=' || complexType.value === '-=' || complexType.value === '*=' || complexType.value === '/=' || complexType.value === '=') {
     if (chunk.returnedData === undefined) {
