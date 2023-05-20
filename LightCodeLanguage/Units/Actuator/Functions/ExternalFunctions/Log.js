@@ -1,4 +1,6 @@
-export { getLogContent }
+export { logContent, getLogContent }
+
+import log from '../../Log.js'
 
 //取得輸出內容
 function getLogContent (complexType, layer) {
@@ -15,12 +17,16 @@ function getLogContent (complexType, layer) {
     let items = []
     keys.map((item) => items.push(getLogContent(complexType.value[item], layer+1)))
     return `{${items.join(', ')}}`
+  } else if (complexType.type === 'function') {
+    return `[函數: (${complexType.parameters.join(', ')})]`
   } else {
     return complexType.value
   }
 }
 
 //輸出內容
-function logContent (parameters) {
-
+function logContent (chunk, complexType, parameters) {
+  let content = []
+  parameters.forEach((item) => content.push(getLogContent(item, 0)))
+  log('normal', content.join(', '), complexType.line)
 }

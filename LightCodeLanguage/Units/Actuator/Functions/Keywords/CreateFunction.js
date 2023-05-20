@@ -21,7 +21,7 @@ export default (chunk, complexType) => {
       }
     }
     let id = generateID(5, Object.keys(chunk.containers))
-    chunk.containers[id] = { name: chunk.codeSegment[chunk.executiveData.row+1].value, mode: 'readOnly', value: { type: 'function', parameters, value: chunk.codeSegment[chunk.executiveData.row+3].value, async: chunk.executiveData.mode === 'async' }}
+    chunk.containers[id] = { name: chunk.codeSegment[chunk.executiveData.row+1].value, mode: 'readOnly', value: { type: 'function', layer: chunk.layer, parameters, value: chunk.codeSegment[chunk.executiveData.row+3].value, async: chunk.executiveData.mode === 'async' }}
     chunk.returnData = { type: 'function', parameters, value: chunk.codeSegment[chunk.executiveData.row+3].value, mode: chunk.executiveData.mode === 'async' }
     chunk.executiveData.row+=3
   } else if (chunk.codeSegment[chunk.executiveData.row].type === 'parameters') {
@@ -35,7 +35,7 @@ export default (chunk, complexType) => {
         parameters.push(item[0].value)
       }
     }
-    chunk.returnData = { type: 'function', parameters, value: chunk.codeSegment[chunk.executiveData.row+2].value, mode: chunk.executiveData.mode === 'async' }
+    chunk.returnData = { type: 'function', layer: chunk.layer, parameters, value: chunk.codeSegment[chunk.executiveData.row+2].value, mode: chunk.executiveData.mode === 'async' }
     chunk.executiveData.row+=2
   }
   chunk.executiveData.mode = undefined

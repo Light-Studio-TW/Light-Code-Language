@@ -63,9 +63,7 @@ async function boot () {
       mode: undefined,
       data: {}
     },
-    containers: {
-      輸出: { name: '輸出', mode: 'readOnly', value: { type: 'externalFunction', value: '[外部函數: 輸出]', async: false }}
-    },
+    containers: {},
     callPath: [],
     returnedData: undefined,
     returnData: { type: 'none', value: '無' },

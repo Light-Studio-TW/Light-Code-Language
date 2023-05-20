@@ -119,7 +119,7 @@ export default function complexTypesAnalyzer (simpleTypes, filePath) {
         if (simpleTypes[i].type === 'symbol' && simpleTypes[i].value === '}' && state.layer === simpleTypes[i].layer) {
           let data = complexTypesAnalyzer(state.value, filePath)
           if (!Array.isArray(data)) return data
-          complexTypes.push({ type: 'chunk', value: state.value, start: state.start, end: simpleTypes[i].end, line: state.startLine, layer: state.layer })
+          complexTypes.push({ type: 'chunk', value: data, start: state.start, end: simpleTypes[i].end, line: state.startLine, layer: state.layer })
           state = {}
         } else state.value.push(simpleTypes[i])
       }

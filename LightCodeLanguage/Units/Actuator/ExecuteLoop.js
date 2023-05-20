@@ -73,7 +73,7 @@ async function executeLoop () {
 function executeChunk (chunk) {
   if (chunk.executiveData.row >= chunk.codeSegment.length) {
     if (chunk.callPath[chunk.callPath.length-1] !== undefined && actuator.chunks[chunk.callPath[chunk.callPath.length-1].id] !== undefined && actuator.chunks[chunk.callPath[chunk.callPath.length-1].id].state === `wait.${chunk.id}`) {
-      actuator.chunks[chunk.callPath[chunk.callPath.length-1].id].returnedData = chunk.returnData
+      if (chunk.type === 'childChunk') actuator.chunks[chunk.callPath[chunk.callPath.length-1].id].returnedData = chunk.returnData
       actuator.chunks[chunk.callPath[chunk.callPath.length-1].id].state = 'running'
     } else if (chunk.id === 'main') actuator.returnData = chunk.returnData
     removeTesk(chunk.id)

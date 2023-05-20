@@ -14,10 +14,10 @@ parentPort.addListener('message', (msg) => {
 })
 
 //輸出東西
-export default (type, content) => {
+export default (type, content, line) => {
   return new Promise((resolve, reject) => {
     let id = generateID(5, Object.keys(messages))
     messages[id] = () => resolve()
-    parentPort.postMessage({ id, type: 'log', data: { type, content }})
+    parentPort.postMessage({ id, type: 'log', data: { type, content, line }})
   })
 }

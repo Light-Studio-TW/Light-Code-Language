@@ -1,5 +1,9 @@
 import { actuator } from '../Main.js'
 
+const builtInFunction = [
+  '輸出'
+]
+
 //使用連結取得容器
 function getContainerByLink (address) {
   if (actuator.chunks[address.split('.')[0]] === undefined || actuator.chunks[address.split('.')[0]].containers[address.split('.')[1]] === undefined) return { address, value: { type: 'none', value: '無' }}
@@ -8,6 +12,9 @@ function getContainerByLink (address) {
 
 //取得容器
 export default (name, layer) => {
+  if (builtInFunction.includes(name)) {
+    return { address: `builtInFunction.${name}`, mode: 'readOnly', value: { type: 'externalFunction', value: name } }
+  }
   let keys = Object.keys(actuator.chunks)
   for (let item of keys) {
     if (layer.substring(0, actuator.chunks[item].layer.length) === actuator.chunks[item].layer) {
