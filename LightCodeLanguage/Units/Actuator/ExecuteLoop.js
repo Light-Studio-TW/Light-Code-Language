@@ -7,8 +7,8 @@ import getContainer from './Functions/Container.js'
 import { expression } from './Functions/Expression.js'
 import parameters from './Functions/Parameters.js'
 import operator from './Functions/Operator.js'
-import object from './Functions/Object.js'
 import keyword from './Functions/Keyword.js'
+import object from './Functions/Object.js'
 import array from './Functions/Array.js'
 import index from './Functions/Index.js'
 import key from './Functions/Key.js'
@@ -80,7 +80,7 @@ function executeChunk (chunk) {
     delete actuator.chunks[chunk.id]
   } else {
     let complexType = chunk.codeSegment[chunk.executiveData.row]
-  
+ 
     if (complexType.type === 'string') chunk.returnData = { type: 'string', value: complexType.value }
     else if (complexType.type === 'number') chunk.returnData = { type: 'number', value: complexType.value }
     else if (complexType.type === 'nan') chunk.returnData = { type: 'nan', value: complexType.value }

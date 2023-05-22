@@ -76,7 +76,6 @@ async function boot () {
   await log('actuatorLog', '啟動完成')
 
   //開始執行
-  console.log(codeSegment)
   executeLoop()
 }
 

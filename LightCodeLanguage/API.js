@@ -6,9 +6,11 @@ class Actuator {
   constructor (mainFilePath, settings) {
     this.#id = createActuator(mainFilePath, settings)
   }
+
   //運行執行器
   run () {
     runActuator(this.#id)
+    return this
   }
 }
 

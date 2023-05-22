@@ -1,4 +1,5 @@
 import typesName from '../TypesName.json' assert { type: 'json' }
+import expressionAnalyzer from './ExpressionAnalyzer.js'
 import checkSyntax from './SyntaxChecker.js'
 
 //複雜類型分析器
@@ -22,6 +23,8 @@ export default function complexTypesAnalyzer (simpleTypes, filePath) {
           for (let i2 = 0; i2 < state.value.length; i2++) {
             let data = complexTypesAnalyzer(state.value[i2], filePath)
             if (!Array.isArray(data)) return data
+            data = expressionAnalyzer(data, filePath)
+            if (!Array.isArray(data)) return data
             let data2 = checkSyntax(data, filePath, ` (<陣列> 的第 ${i2} 項)`)
             if (data2 !== undefined) {
               data2.path.push({ filePath, function: '{複雜類型分析器}' })
@@ -40,6 +43,8 @@ export default function complexTypesAnalyzer (simpleTypes, filePath) {
           let items = []
           for (let i2 = 0; i2 < state.value.length; i2++) {
             let data = complexTypesAnalyzer(state.value[i2], filePath)
+            if (!Array.isArray(data)) return data
+            data = expressionAnalyzer(data, filePath)
             if (!Array.isArray(data)) return data
             let data2 = checkSyntax(data, filePath, ` (<參數列> 的第 ${i2} 項)`)
             if (data2 !== undefined) {
@@ -72,6 +77,8 @@ export default function complexTypesAnalyzer (simpleTypes, filePath) {
                   for (let i = skip+2; i < item.length; i++) value.push(item[i])
                   value = complexTypesAnalyzer(value, filePath)
                   if (!Array.isArray(value)) return value
+                  value = expressionAnalyzer(value, filePath)
+                  if (!Array.isArray(value)) return value
                   let data = checkSyntax(value, filePath, ` (<物件> 的 ${item[skip].value})`)
                   if (data !== undefined) {
                     data.path.push({ filePath, function: '{複雜類型分析器}' })
@@ -102,6 +109,8 @@ export default function complexTypesAnalyzer (simpleTypes, filePath) {
           for (let i2 = 0; i2 < state.value.length; i2++) {
             let data = complexTypesAnalyzer(state.value[i2])
             if (!Array.isArray(data)) return data
+            data = expressionAnalyzer(data, filePath)
+            if (!Array.isArray(data)) return data
             let data2 = checkSyntax(data, filePath, ` (<索引列> 的第 ${i2} 項)`)
             if (data2 !== undefined) {
               data2.path.push({ filePath, function: '{複雜類型分析器}' })
@@ -118,6 +127,8 @@ export default function complexTypesAnalyzer (simpleTypes, filePath) {
       } else if (state.nowType === 'chunk') {
         if (simpleTypes[i].type === 'symbol' && simpleTypes[i].value === '}' && state.layer === simpleTypes[i].layer) {
           let data = complexTypesAnalyzer(state.value, filePath)
+          if (!Array.isArray(data)) return data
+          data = expressionAnalyzer(data, filePath)
           if (!Array.isArray(data)) return data
           complexTypes.push({ type: 'chunk', value: data, start: state.start, end: simpleTypes[i].end, line: state.startLine, layer: state.layer })
           state = {}
