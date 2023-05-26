@@ -130,6 +130,19 @@ export default function complexTypesAnalyzer (simpleTypes, filePath) {
           if (!Array.isArray(data)) return data
           data = expressionAnalyzer(data, filePath)
           if (!Array.isArray(data)) return data
+          if (data.length > 0) {
+            for (let i = 1; i <= data[data.length-1].line; i++) {
+              let chunk2 = []
+              data.map((item) => {
+                if (item.line === i) chunk2.push(item)
+              })
+              let data2 = checkSyntax(chunk2, filePath)
+              if (data2 !== undefined) {
+                data2.path.push({ filePath, function: '{複雜類型分析器}' })
+                return data2
+              }
+            } 
+          }
           complexTypes.push({ type: 'chunk', value: data, start: state.start, end: simpleTypes[i].end, line: state.startLine, layer: state.layer })
           state = {}
         } else state.value.push(simpleTypes[i])

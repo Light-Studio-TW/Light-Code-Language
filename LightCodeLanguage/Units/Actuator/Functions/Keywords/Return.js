@@ -16,24 +16,19 @@ export default (chunk, complexType) => {
     createChunk(chunk, chunk.name, 'childChunk', getNewLayerID(chunk.layer), chunk.path, chunk2, complexType.line, true)
     return true
   } else {
-    for (let i = chunk.callPath.length-1; i >= 0; i--) {
-      if (actuator[chunk.callPath[i].id] !== undefined) {
-
-      }
-    }
-    stopChunk(chunk, chunk.returnedData)
+    stopChunk(chunk)
   }
 }
 
 //停止區塊
-function stopChunk (chunk, returnData) {
+function stopChunk (chunk) {
   delete actuator.chunks[chunk.id]
   removeTesk(chunk.id)
   for (let i = chunk.callPath.length-1; i >= 0; i--) {
     if (actuator.chunks[chunk.callPath[i].id] !== undefined && ((i < chunk.callPath.length-1 && actuator.chunks[chunk.callPath[i].id].state === `wait.${chunk.callPath[i+1].id}`) || (i === chunk.callPath.length-1 && actuator.chunks[chunk.callPath[i].id].state === `wait.${chunk.id}`))) {
       if (actuator.chunks[chunk.callPath[i].id].type === 'chunk') {
         actuator.chunks[chunk.callPath[i].id].state = 'running'
-        actuator.chunks[chunk.callPath[i].id].returnedData = returnData
+        actuator.chunks[chunk.callPath[i].id].returnedData = chunk.returnedData
         return
       } else {
         delete actuator.chunks[chunk.callPath[i].id]

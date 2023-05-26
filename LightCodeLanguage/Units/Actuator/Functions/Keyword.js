@@ -1,5 +1,6 @@
 import createVariable from './Keywords/CreateVariable.js'
 import createFunction from './Keywords/CreateFunction.js'
+import repeat from './Keywords/Repeat.js'
 import Return from './Keywords/Return.js'
 import link from './Keywords/Link.js'
 
@@ -15,5 +16,7 @@ export default (chunk, complexType) => {
   } else if (complexType.value === '返回') {
     if (Return(chunk, complexType)) return true
   } else if (complexType.value === '等待') chunk.executiveData.mode = 'wait'
-  else if (complexType.value === '異同步') chunk.executiveData.mode = 'async'
+  else if (complexType.value === '重複') {
+    if (repeat(chunk, complexType)) return true
+  } else if (complexType.value === '異同步') chunk.executiveData.mode = 'async'
 }
